@@ -7,7 +7,7 @@ import {CONTENT_HOST, useFetchContentAPI, useFetchPutCars} from "../hooks/UseFet
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import {Breadcrumbs, Button, Chip} from "@mui/material";
+import {Breadcrumbs, Button, Chip, Grid} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import {GenericCarOrGroupTable} from "./GenericCarOrGroupTable";
@@ -19,9 +19,12 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import TodayIcon from "@mui/icons-material/Today";
 import TableHead from "@mui/material/TableHead";
+import Paper from "@mui/material/Paper";
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
 
 
-const StyledTableCell = styled(TableCell)(({theme}) => ({
+const StyledGrid = styled(TableCell)(({theme}) => ({
     backgroundColor: theme.palette.primary.light, color: theme.palette.common.white, fontSize: 24,
 }));
 
@@ -80,61 +83,71 @@ export const CollapsibleRow = memo(({dispatch, groupValue, groupIndex, acumGroup
     }
 
     return (<React.Fragment>
+
         <TableRow sx={{borderBottom: 'unset'}}>
-            <StyledTableCell>
-                <IconButton
-                    aria-label="expand row"
-                    size="small"
-                    onClick={() => setOpen(!open)}
-                >
-                    {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
-                </IconButton>
-            </StyledTableCell>
+            <TableCell align="center" colSpan={4}>
+                <Grid container spacing={0}>
 
-            <StyledTableCell component="th" scope="row">
+                    <StyledGrid>
+                        <IconButton
+                            aria-label="expand row"
+                            size="small"
+                            onClick={() => setOpen(!open)}
+                        >
+                            {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
+                        </IconButton>
+                    </StyledGrid>
 
-                {<Breadcrumbs aria-label="breadcrumb">
-                    {acumGroupIndex.map((groupIndex, i) => (<CustomChip
-                            key={groupIndex}
-                            component="a"
-                            href="#"
-                            label={acumGroupValue[i]}
-                            icon={groupIconsByIndex(groupIndex, "text.primary")}
-                        />
+                    <StyledGrid>
 
-                    ))}
+                        {<Breadcrumbs aria-label="breadcrumb">
+                            {acumGroupIndex.map((groupIndex, i) => (<CustomChip
+                                    key={groupIndex}
+                                    component="a"
+                                    href="#"
+                                    label={acumGroupValue[i]}
+                                    icon={groupIconsByIndex(groupIndex, "text.primary")}
+                                />
 
-                    <CustomChip2
-                        component="a"
-                        href="#"
-                        label={groupValueName}
-                        icon={groupIconsByIndex(groupIndex, "text.primary")}
-                    />
-                </Breadcrumbs>}
+                            ))}
 
-            </StyledTableCell>
+                            <CustomChip2
+                                component="a"
+                                href="#"
+                                label={groupValueName}
+                                icon={groupIconsByIndex(groupIndex, "text.primary")}
+                            />
+                        </Breadcrumbs>}
 
-            <StyledTableCell align="right">
-                <Button onClick={archiveAll} variant="contained" color="secondary">Archive all group</Button>
-            </StyledTableCell>
+                    </StyledGrid>
+
+                    <StyledGrid align="right">
+                        <Button onClick={archiveAll} variant="contained" color="secondary">Archive all
+                            group</Button>
+                    </StyledGrid>
 
 
-            <StyledTableCell align="right">
-                <Chip label={<Typography variant="h6" gutterBottom>
-                    {groupValueCount}
-                </Typography>
+                    <StyledGrid align="right">
+                        <Chip label={<Typography variant="h6" gutterBottom>
+                            {groupValueCount}
+                        </Typography>
 
-                } size="medium" color="primary"/>
-            </StyledTableCell>
+                        } size="medium" color="primary"/>
+                    </StyledGrid>
 
-            <Collapse in={open} timeout="auto" unmountOnExit>
-                <GroupProvider prevGroupValue={groupValue[0]} prevGroupIndex={groupIndex}>
-                    <GenericCarOrGroupTable/>
-                </GroupProvider>
-            </Collapse>
+                </Grid>
+
+            </TableCell>
 
         </TableRow>
 
+        <TableRow sx={{borderBottom: 'unset', maxWidth: '100%'}}>
+                <Collapse in={open} timeout="auto" unmountOnExit sx ={{ maxWidth: '500px'}}>
+                    <GroupProvider prevGroupValue={groupValue[0]} prevGroupIndex={groupIndex}>
+                        <GenericCarOrGroupTable/>
+                    </GroupProvider>
+                </Collapse>
+        </TableRow>
 
         {/*<StyledTableRow>*/}
         {/*    <TableHead>*/}
