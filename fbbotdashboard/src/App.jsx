@@ -3,7 +3,7 @@ import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import {ThemeProvider} from "@mui/material";
 import {CustomThemeOptions} from "./styles/CustomTheme";
 import MainPage from "./pages/MainPage";
-import UserProvider from "./conntexts/UserContext";
+import UserProvider from "./contexts/UserContext";
 import LogIn from "./pages/LogIn";
 import NotFound from "./pages/NotFound";
 import DashboardLayout from "./layouts/dashboard/Layout";

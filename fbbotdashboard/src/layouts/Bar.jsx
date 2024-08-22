@@ -1,11 +1,10 @@
-import {useAuth} from "../conntexts/UserContext";
+import {useAuth} from "../contexts/UserContext";
 import AdminNav from "./AdminBar";
 import LandingBar from "./LandingBar";
 
 const Bar = () => {
 
     const {user}  = useAuth();
-    console.log(user);
     return user ? <AdminNav/> : <LandingBar/>;
 };
 

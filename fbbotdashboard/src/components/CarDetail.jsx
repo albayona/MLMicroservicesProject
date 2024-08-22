@@ -7,8 +7,13 @@ import {
     Button, CardActionArea, CardActions, Chip, Divider, Grid, ImageList, ImageListItem, Stack, styled
 } from '@mui/material';
 import Box from "@mui/material/Box";
+import {memo} from "react";
 
-export default function DetailCard({car}) {
+function areCarDetailPropsEqual(oldProps, newProps) {
+    return oldProps.id === newProps.id;
+}
+
+export const CarDetail = memo(({car}) => {
 
     const Item = styled(Box)(({theme}) => ({
         padding: theme.spacing(0), textAlign: 'center', color: theme.palette.text.secondary,
@@ -25,7 +30,7 @@ export default function DetailCard({car}) {
     ];
 
 
-    const Root = styled('div')(({ theme }) => ({
+    const Root = styled('div')(({theme}) => ({
         width: '100%',
         ...theme.typography.body2,
         color: theme.palette.text.secondary,
@@ -33,7 +38,6 @@ export default function DetailCard({car}) {
             marginTop: theme.spacing(2),
         },
     }));
-
 
 
     return (<Card sx={{maxWidth: '100%', maxHeight: '100%'}}>
@@ -67,12 +71,13 @@ export default function DetailCard({car}) {
                                         Main Attributes
                                     </Typography>
 
-                                } size="medium" />
+                                } size="medium"/>
                             </Divider>
 
                             <Item>
                                 {attributes.map((attr, index) => (
-                                    <Chip key={index} label={attr.label} style={{marginRight: '5px', marginBottom: '5px'}}/>
+                                    <Chip key={index} label={attr.label}
+                                          style={{marginRight: '5px', marginBottom: '5px'}}/>
                                 ))}
                             </Item>
 
@@ -82,7 +87,7 @@ export default function DetailCard({car}) {
                                         Secondary Attributes
                                     </Typography>
 
-                                } size="medium" />
+                                } size="medium"/>
                             </Divider>
 
                             <Item>
@@ -97,7 +102,7 @@ export default function DetailCard({car}) {
                                         Seller Attributes
                                     </Typography>
 
-                                } size="medium" />
+                                } size="medium"/>
                             </Divider>
 
                             <Item>
@@ -129,4 +134,4 @@ export default function DetailCard({car}) {
             </Button>
         </CardActions>
     </Card>);
-}
+}, areCarDetailPropsEqual);

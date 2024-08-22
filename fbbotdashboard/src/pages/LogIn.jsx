@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import {useAuth} from "../conntexts/UserContext";
+import {useAuth} from "../contexts/UserContext";
 import {Alert, Paper} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 

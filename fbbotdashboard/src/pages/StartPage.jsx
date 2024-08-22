@@ -1,5 +1,5 @@
 import {Navigate} from 'react-router-dom';
-import {useAuth} from "../conntexts/UserContext";
+import {useAuth} from "../contexts/UserContext";
 
 const  StartPage = () => {
 
