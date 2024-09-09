@@ -7,17 +7,21 @@ export const SCRAPE_HOST = 'http://localhost:8002'
 
 export const useFetchContentAPI = (request) => {
     const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+
     useEffect(() => {
         let ignore = false;
         if (request.triggerRequest) {
-            // console.log('useFetchContentAPI', request);
+            // console.log('useFetchContentAPI', request.endpoint);
+            setIsLoading(true);
 
             let req = {
                 method: request.method, headers: request.headers,
             };
 
             if (request.method === 'POST' || request.method === 'PUT') {
-                req.body = JSON.stringify(request.body);
+                req.body = JSON.stringify(request.payload);
             }
 
             fetch(request.endpoint, req)
@@ -32,11 +36,12 @@ export const useFetchContentAPI = (request) => {
                     if (!ignore) {
                         request.callback(data);
                         setError(null);
-
+                        setIsLoading(false);
                     }
                 })
                 .catch(err => {
                     setError(err.message);
+                    setIsLoading(false);
                     console.error(err);
                 })
         }
@@ -46,7 +51,7 @@ export const useFetchContentAPI = (request) => {
         };
     }, [request])
 
-    return [error];
+    return [error, isLoading];
 }
 
 

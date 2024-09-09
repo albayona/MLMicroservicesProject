@@ -17,7 +17,7 @@ import {createTheme} from "@mui/material/styles";
 
 export const SideNav = ({width, height}) => {
     const location = useLocation();
-    const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const [selectedIndex, setSelectedIndex] = React.useState(0);
 
     const handleListItemClick = (event, index) => {
         setSelectedIndex(index);
@@ -43,7 +43,7 @@ export const SideNav = ({width, height}) => {
             MuiListItemIcon: {
                 styleOverrides: {
                     root: ({ownerState}) => ({
-                        color: (ownerState["aria-selected"] === true ? globalTheme.palette.text.contrastText : globalTheme.palette.text.secondary) + '!important',
+                        color: (ownerState["aria-selected"] === true ? globalTheme.palette.primary.contrastText : globalTheme.palette.text.secondary) + '!important',
                         minWidth: 'auto',
                     }),
 
@@ -53,7 +53,7 @@ export const SideNav = ({width, height}) => {
             MuiListItemText: {
                 styleOverrides: {
                     primary: ({ownerState}) => ({
-                        color: (ownerState["aria-selected"] === true ? globalTheme.palette.text.contrastText : globalTheme.palette.text.secondary) + '!important',
+                        color: (ownerState["aria-selected"] === true ? globalTheme.palette.primary.contrastText : globalTheme.palette.text.secondary) + '!important',
                         minWidth: 'auto',
                     }),
 

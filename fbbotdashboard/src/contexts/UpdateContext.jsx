@@ -9,7 +9,7 @@ export const UpdateContext = createContext(null);
 export const UpdateProvider = ({children}) => {
     const {token} = useAuth();
     const {user} = useAuth();
-    const [subscribersToUpdate, setSubscribersToUpdate] = useState([]);
+    const [subscribersToUpdate, setSubscribersToUpdate] = useState(['root']);
     const [subscribers, setSubscribers] = useState([]);
 
     console.log("subscribers", subscribers);
@@ -40,19 +40,26 @@ export const UpdateProvider = ({children}) => {
     const removeSubscriber = (id) => {
         if (id) {
             setSubscribers(prev => prev.filter(sub => sub !== id));
+            setSubscribersToUpdate(prev => prev.filter(subToUpdate => subToUpdate !== id));
         }
     };
 
-    const addSubscriberToUpdate = (data) => {
+    const addSubscriberToUpdate = (data, includeRoot = true) => {
+        if (!data) return;
 
-        let subToUpdate = []
+        let subToUpdate = ['root'];
+
+        if (!includeRoot) {
+            subToUpdate = [];
+        }
+
         subscribers.forEach(sub => {
             if (data.includes(sub)) {
                 subToUpdate.push(sub);
             }
         });
 
-        setSubscribersToUpdate(prev => [...prev, subToUpdate]);
+        setSubscribersToUpdate(prev => [...new Set([...prev, ...subToUpdate])]);
     }
 
     const needUpdate = (sub) => {
@@ -81,7 +88,7 @@ export const UpdateProvider = ({children}) => {
                         },
                         onopen(res) {
                             if (res.ok && res.status === 200) {
-                                console.log("Connection made ", res);
+                                // console.log("Connection made ", res);
                             } else if (
                                 res.status >= 400 &&
                                 res.status < 500 &&
@@ -120,7 +127,8 @@ export const UpdateProvider = ({children}) => {
             addSubscriber,
             removeSubscriber,
             needUpdate,
-            removeSubscriberToUpdate
+            removeSubscriberToUpdate,
+            addSubscriberToUpdate
         }}>
             {children}
         </UpdateContext.Provider>

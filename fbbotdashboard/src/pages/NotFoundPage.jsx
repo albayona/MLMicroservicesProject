@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Button, Container, Typography } from '@mui/material';
 
-const NotFound = () => (
+const NotFoundPage = () => (
     <>
 
         <Box
@@ -54,4 +54,4 @@ const NotFound = () => (
     </>
 );
 
-export default NotFound;
+export default NotFoundPage;

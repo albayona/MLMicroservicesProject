@@ -25,7 +25,7 @@ function Copyright(props) {
     </Typography>);
 }
 
-export default function LogIn() {
+export default function LogInPage() {
 
     const [input, setInput] = React.useState({
         username: "", password: "", role: "",
@@ -146,12 +146,12 @@ export default function LogIn() {
                     </Button>
                     <Grid container>
                         <Grid item xs>
-                            <Link href="src/pages/LogIn#" variant="body2">
+                            <Link href="src/pages/LogInPage#" variant="body2">
                                 Recover password
                             </Link>
                         </Grid>
                         <Grid item>
-                            <Link href="src/pages/LogIn#" variant="body2">
+                            <Link href="src/pages/LogInPage#" variant="body2">
                                 {"Sign up"}
                             </Link>
                         </Grid>

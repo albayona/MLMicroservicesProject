@@ -1,28 +1,40 @@
-import {createContext, useContext, useEffect, useReducer, useState} from 'react';
-import {UpdateContext, useUpdate} from "./updateContext";
+import {createContext, useContext, useEffect, useReducer} from 'react';
+import {useUpdate} from "./UpdateContext";
+import {orderedAcumValues} from "../utils/utils.py";
 
 export const GroupContext = createContext(null);
 export const GroupDispatchContext = createContext(null);
 
 export const INDEXES_GROUP_NAME = {
-    0: "Brand",
-    1: "Price",
-    2: "Miles",
-    3: "Year",
-    4: "No Grouping"
+    0: "No Grouping",
+    1: "Brand",
+    2: "Price",
+    3: "Miles",
+    4: "Year",
+    5: "Place",
+};
+
+export const INDEXES_GROUP_TYPE = {
+    0: "None",
+    1: "Text",
+    2: "Number",
+    3: "Number",
+    4: "Number",
+    5: "Text",
 };
 
 
 export function GroupProvider({children, prevGroupValue, prevGroupIndex}) {
     const parentGroupState = useGroupState();
     const acumGroupValue = [...parentGroupState.acumGroupValue, prevGroupValue];
+    const acumGroupIndex = [...parentGroupState.acumGroupIndex, prevGroupIndex];
 
     const initialState = {
         needUpdate: true,
-        groupIndex: 4,
-        acumGroupIndex: [...parentGroupState.acumGroupIndex, prevGroupIndex],
+        groupIndex: 0,
+        acumGroupIndex: acumGroupIndex,
         groupValues: [],
-        carValues: [],
+        carValues: {},
         acumGroupValue: acumGroupValue,
         sseUpdate: "",
         level: parentGroupState.level + 1,
@@ -33,10 +45,10 @@ export function GroupProvider({children, prevGroupValue, prevGroupIndex}) {
 
     useEffect(() => {
         if (!subscribers.includes(acumGroupValue)) {
-            addSubscriber(acumGroupValue.join('XX'));
+            addSubscriber(orderedAcumValues(acumGroupValue, acumGroupIndex).join('XX'));
         }
         return () => {
-            removeSubscriber(acumGroupValue.join('XX'));
+            removeSubscriber(orderedAcumValues(acumGroupValue, acumGroupIndex).join('XX'));
         }
     }, []);
 
@@ -61,10 +73,10 @@ export function RootGroupProvider({children}) {
 
     const initialState = {
         needUpdate: true,
-        groupIndex: 0,
+        groupIndex: 1,
         acumGroupIndex: [],
         groupValues: [],
-        carValues: [],
+        carValues: {},
         acumGroupValue: [],
         sseUpdate: "",
         level: 0,

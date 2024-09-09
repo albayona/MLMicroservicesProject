@@ -10,9 +10,10 @@ export const CustomThemeOptions = createTheme({
         },
         primary: {
             main: '#3f51b5',
-            light: '#e7e8ee',
+            light: '#f1f3f6',
             contrastText: '#fff',
         },
+
         error: {
             main: '#f44336',
         },

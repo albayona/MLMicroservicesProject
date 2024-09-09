@@ -1,9 +1,43 @@
 import * as React from 'react';
-import {AppBar, Button, TextField, Toolbar} from "@mui/material";
+import {AppBar, Button, TextField, Toolbar, useTheme} from "@mui/material";
 import {SCRAPE_HOST} from "../hooks/UseFetch";
 import {useAuth} from "../contexts/UserContext";
-import {TabSelector} from "../components/TabSelector";
+import {TabSelector} from "../components/utils/TabSelector";
+import {styled} from "@mui/material/styles";
 
+
+export const CustomTextField = styled(TextField)(({theme}) => {
+    return {
+
+        '& input': {
+            color: 'white',
+        },
+        '& label.Mui-focused': {
+            color: 'white',
+        },
+        '& .MuiInput-underline:after': {
+            color: 'white',
+            borderBottomColor: 'white',
+        },
+        '& .MuiInputLabel-root': {
+            color: 'white',
+        },
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                color: 'white',
+                borderColor: 'white',
+            },
+            '&:hover fieldset': {
+                color: 'white',
+                borderColor: 'white',
+            },
+            '&.Mui-focused fieldset': {
+                color: 'white',
+                borderColor: 'white',
+            },
+        },
+    }
+});
 
 export default function MainPage() {
 
@@ -11,7 +45,6 @@ export default function MainPage() {
     const {token} = useAuth();
     const {user} = useAuth();
     const [tabsIndexes, setTabsIndexes] = React.useState([0, 1, 2]);
-
 
 
     function scrape() {
@@ -47,7 +80,7 @@ export default function MainPage() {
             <AppBar position="static">
                 <Toolbar variant="dense">
                     <Button onClick={scrape} variant="contained" color="secondary">Scrape</Button>
-                    <TextField
+                    <CustomTextField
                         id="filled-basic"
                         label="Scrape Url"
                         value={scrapeUrl}
@@ -56,6 +89,8 @@ export default function MainPage() {
                         }}
                         variant="filled"
                         fullWidth
+                        color="secondary"
+
                     />
                 </Toolbar>
             </AppBar>

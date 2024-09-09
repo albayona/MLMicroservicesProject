@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Button, Container, Typography } from '@mui/material';
 
-const NotAuthorized = () => (
+const NotAuthorizedPage = () => (
     <>
 
         <Box
@@ -54,4 +54,4 @@ const NotAuthorized = () => (
     </>
 );
 
-export default NotAuthorized;
+export default NotAuthorizedPage;

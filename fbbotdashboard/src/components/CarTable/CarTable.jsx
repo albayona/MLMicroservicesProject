@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {memo, useState} from 'react';
+import {memo, useMemo, useState} from 'react';
 import Box from '@mui/material/Box';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
@@ -7,10 +7,11 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {DataGrid, GridActionsCellItem, GridToolbar,} from '@mui/x-data-grid';
-import {CONTENT_HOST, useFetchContentAPI} from "../hooks/UseFetch";
+import {CONTENT_HOST, useFetchContentAPI} from "../../hooks/UseFetch";
 import {Button, Modal} from "@mui/material";
-import {useAuth} from "../contexts/UserContext";
+import {useAuth} from "../../contexts/UserContext";
 import {CarDetail} from "./CarDetail";
+import {orderedAcumValues, parseDate} from "../../utils/utils.py";
 
 const modalStyle = {
     position: 'absolute',
@@ -27,76 +28,108 @@ const modalStyle = {
 
 
 function areCarTablePropsEqual(oldProps, newProps) {
-    return oldProps.cars.length === newProps.cars.length &&
-        oldProps.cars.every((oldVal, index) => {
-            const newVal = newProps.cars[index];
+    return oldProps.isLoading === newProps.isLoading &&
+        oldProps.paginationSortFilterModel.page === newProps.paginationSortFilterModel.page &&
+        oldProps.paginationSortFilterModel.pageSize === newProps.paginationSortFilterModel.pageSize &&
+        oldProps.paginationSortFilterModel?.sortField === newProps.paginationSortFilterModel?.sortField &&
+        oldProps.paginationSortFilterModel?.sort === newProps.paginationSortFilterModel?.sort &&
+        oldProps.paginationSortFilterModel?.filterField === newProps.paginationSortFilterModel?.filterField &&
+        oldProps.paginationSortFilterModel?.filterOperator === newProps.paginationSortFilterModel?.filterOperator &&
+        oldProps.paginationSortFilterModel?.filterValue === newProps.paginationSortFilterModel?.filterValue &&
+        oldProps.carsPage?.results?.length === newProps.carsPage?.results?.length &&
+        oldProps.carsPage?.results?.every((oldVal, index) => {
+            const newVal = newProps.carsPage?.results[index];
             return oldVal.id === newVal.id;
         })
 }
 
-export const CarTable = memo(({cars, type, dispatch, setOldActionTrigger, pagination})  =>{
-    console.log("CarTable", cars, type);
+
+const endpointsByAction = {
+    0: '/like/',
+    1: '/unlike/',
+    2: '/see/',
+    3: '/unsee/',
+    4: '/info/',
+    6: '/empty-fav/',
+    7: '/mark-all-seen/',
+    8: 'None',
+};
+
+export const CarTable = memo(({
+                                  carsPage,
+                                  type,
+                                  setUpdateArchiveTrigger,
+                                  addSubscriberToUpdate,
+                                  acumGroupValues,
+                                  acumGroupIndex,
+                                  paginationSortFilterModel,
+                                  rowCount,
+                                  isLoading,
+                                  handleSortModelChange,
+                                  handlePaginationModelChange,
+                                  handleFilterModelChange
+
+                              }) => {
 
     const [selectedCar, setSelectedCar] = useState({});
-    const [actionEndpoint, setActionEndpoint] = useState('');
-    const [actionTrigger, setActionTrigger] = useState(false);
+    const [action, setAction] = useState({trigger: false, index: 8, id: ""});
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const {token} = useAuth();
     const {user} = useAuth();
-    const height = (pagination) ? '600px' : 'auto';
 
+    const paginationModel = useMemo(
+        () => ({page: paginationSortFilterModel.page, pageSize: paginationSortFilterModel.pageSize}),
+        [paginationSortFilterModel.page, paginationSortFilterModel.pageSize]
+    );
+
+
+    const requestUpdate = () => {
+        if (type === "New") {
+            const subscriber = (acumGroupIndex.length === 0) ? 'root' : orderedAcumValues(acumGroupValues, acumGroupIndex).join('XX');
+            addSubscriberToUpdate(subscriber);
+        } else {
+            if (action.index === 3) {
+                const carAction = carsPage.results.find(car => car.id === action.id);
+                addSubscriberToUpdate(`${carAction.brand}XX${carAction.price_range}XX${carAction.miles_range}XX${carAction.year}`);
+            }
+            setUpdateArchiveTrigger(true);
+        }
+    }
 
     const tableActionRequest = {
-        triggerRequest: actionTrigger,
-        callback: () => {
-            setActionTrigger(false)
-
-            if (type === "New") {
-                dispatch({type: 'requestUpdate'});
-            } else {
-                setOldActionTrigger(true);
-            }
-
-        },
-        method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'X-Consumer-Custom-Id': user,
-        },
-        endpoint: actionEndpoint,
-        payload: null,
+        triggerRequest: action.trigger, callback: () => {
+            requestUpdate();
+            setAction({trigger: false, index: 8, id: ""});
+        }, method: 'PUT', headers: {
+            'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'X-Consumer-Custom-Id': user,
+        }, endpoint: `${CONTENT_HOST}${endpointsByAction[action.index]}${action.id}`, payload: null,
     }
 
     const [error] = useFetchContentAPI(tableActionRequest);
 
 
     const handleLikeClick = (id) => () => {
-        setActionEndpoint(`${CONTENT_HOST}/like/` + id);
-        setActionTrigger(true);
+        setAction({trigger: true, index: 0, id: id});
     };
 
 
     const handleDislikeClick = (id) => () => {
-        setActionEndpoint(`${CONTENT_HOST}/unlike/` + id);
-        setActionTrigger(true);
+        setAction({trigger: true, index: 1, id: id});
     };
 
     const handleArchiveClick = (id) => () => {
-        setActionEndpoint(`${CONTENT_HOST}/see/` + id);
-        setActionTrigger(true);
+        setAction({trigger: true, index: 2, id: id});
     };
 
     const handleUnarchiveClick = (id) => () => {
-        setActionEndpoint(`${CONTENT_HOST}/unsee/` + id);
-        setActionTrigger(true);
+        setAction({trigger: true, index: 3, id: id});
     };
 
     const handleInfoClick = (id) => () => {
-        setSelectedCar(cars.find(car => car.id === id));
+        setSelectedCar(carsPage.results.find(car => car.id === id));
         handleOpen();
     };
 
@@ -107,12 +140,18 @@ export const CarTable = memo(({cars, type, dispatch, setOldActionTrigger, pagina
     };
 
     function emptyFavorites() {
-        setActionEndpoint(`${CONTENT_HOST}/empty-fav/`);
-        setActionTrigger(true);
+        setAction({trigger: true, index: 6, id: ""});
+    }
+
+    function archiveAll() {
+        setAction({trigger: true, index: 7, id: ""});
     }
 
     const emptyFavsButton = (type === 'Favs') ?
         <Button onClick={emptyFavorites} variant="contained" color='secondary'>Empty favorites</Button> : null;
+
+    const archiveAllButton = (type === 'New' && acumGroupIndex.length === 0) ?
+        <Button onClick={archiveAll} variant="contained" color='secondary'>Archive all</Button> : null;
 
 
     const actionsByType = (id) => {
@@ -218,15 +257,16 @@ export const CarTable = memo(({cars, type, dispatch, setOldActionTrigger, pagina
 
     return (<Box
         sx={{
-            height: {height}, width: 'auto', '& .actions': {
+
+            height: 'auto', width: 'auto', '& .actions': {
                 color: 'text.secondary',
             }, '& .textPrimary': {
                 color: 'text.primary',
-            },
-            overflowX: 'auto',
+            }, overflowX: 'auto',
         }}
     >
         {emptyFavsButton}
+        {archiveAllButton}
         <Modal
             open={open}
             onClose={handleClose}
@@ -240,16 +280,22 @@ export const CarTable = memo(({cars, type, dispatch, setOldActionTrigger, pagina
 
         <DataGrid
             autosizeOnMount
-            hideFooterPagination={!pagination}
-            hideFooter={!pagination}
-            rows={cars}
+            autoHeight
+            rows={parseDate(carsPage?.results)}
             columns={columns}
             editMode="row"
+            paginationMode="server"
             processRowUpdate={processRowUpdate}
             slots={{
                 toolbar: GridToolbar,
             }}
             pageSizeOptions={[5, 10, 25, 50, 100]}
+            paginationModel={paginationModel}
+            loading={isLoading}
+            rowCount={rowCount}
+            onSortModelChange={handleSortModelChange}
+            onFilterModelChange={handleFilterModelChange}
+            onPaginationModelChange={handlePaginationModelChange}
         />
     </Box>);
 }, areCarTablePropsEqual);
